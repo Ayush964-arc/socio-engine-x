@@ -1,0 +1,18 @@
+streamlit
+google-api-python-client
+python-dotenv
+google-generativeai
+matplotlib
+pandas
+Pillow
+requests
+
+// new
+flask
+flask-session
+google-api-python-client
+python-dotenv
+google-generativeai
+plotly
+pandas
+requests
