@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Socio-Engine-X | Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Inter',sans-serif; background:#0a0a0f; color:#fff; }
+
+.bg-animate {
+  position:fixed; inset:0;
+  background:linear-gradient(135deg,#0a0a0f,#1a0a2e,#0a0a0f);
+  background-size:400% 400%; animation:bgShift 10s ease infinite; z-index:0;
+}
+@keyframes bgShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+
+nav {
+  position:sticky; top:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 48px;
+  background:rgba(10,10,15,0.8); backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.nav-logo { font-size:20px; font-weight:900; background:linear-gradient(135deg,#a855f7,#ec4899); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.nav-right { display:flex; gap:12px; }
+.nav-btn {
+  background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12);
+  color:#fff; border-radius:10px; padding:8px 20px; font-size:14px;
+  cursor:pointer; transition:all 0.3s;
+}
+.nav-btn:hover { background:rgba(168,85,247,0.2); border-color:#a855f7; }
+.nav-btn.primary { background:linear-gradient(135deg,#7c3aed,#a855f7); border:none; box-shadow:0 0 20px rgba(124,58,237,0.4); }
+
+.page { position:relative; z-index:10; padding:40px 48px; max-width:1400px; margin:0 auto; }
+
+/* Channel Header */
+.channel-header {
+  display:flex; align-items:center; gap:28px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(168,85,247,0.25);
+  border-radius:24px; padding:32px;
+  margin-bottom:32px;
+  position:relative; overflow:hidden;
+}
+.channel-header::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(236,72,153,0.05));
+}
+.pfp-wrap { position:relative; flex-shrink:0; }
+.pfp-img {
+  width:110px; height:110px; border-radius:50%;
+  border:3px solid #a855f7; object-fit:cover;
+  box-shadow:0 0 30px rgba(168,85,247,0.7),0 0 60px rgba(168,85,247,0.3);
+  animation:pfpGlow 3s ease-in-out infinite;
+}
+@keyframes pfpGlow {
+  0%,100%{box-shadow:0 0 30px rgba(168,85,247,0.7),0 0 60px rgba(168,85,247,0.3)}
+  50%{box-shadow:0 0 50px rgba(168,85,247,1),0 0 100px rgba(236,72,153,0.5)}
+}
+.pfp-fallback {
+  width:110px; height:110px; border-radius:50%;
+  background:linear-gradient(135deg,#7c3aed,#ec4899);
+  display:flex; align-items:center; justify-content:center;
+  font-size:42px;
+  box-shadow:0 0 40px rgba(168,85,247,0.7);
+}
+.channel-info { position:relative; z-index:1; flex:1; }
+.channel-name { font-size:32px; font-weight:900; margin-bottom:8px; }
+.channel-meta { font-size:14px; color:rgba(255,255,255,0.5); margin-bottom:12px; }
+.badge {
+  display:inline-block;
+  background:linear-gradient(135deg,#7c3aed,#ec4899);
+  padding:6px 18px; border-radius:20px;
+  font-size:13px; font-weight:700;
+  box-shadow:0 0 20px rgba(124,58,237,0.5);
+  margin-right:8px;
+}
+
+/* Section titles */
+.section-title {
+  font-size:22px; font-weight:800;
+  background:linear-gradient(135deg,#a855f7,#ec4899);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  border-left:4px solid #7c3aed;
+  padding-left:14px; margin:40px 0 20px;
+  filter:drop-shadow(0 0 10px rgba(168,85,247,0.5));
+}
+
+/* Stat cards */
+.stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:32px; }
+.stat-card {
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:18px; padding:24px;
+  text-align:center; transition:all 0.3s ease; cursor:default;
+  position:relative; overflow:hidden;
+}
+.stat-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,#7c3aed,#ec4899);
+  transform:scaleX(0); transition:transform 0.3s;
+}
+.stat-card:hover::before { transform:scaleX(1); }
+.stat-card:hover {
+  border-color:rgba(168,85,247,0.5);
+  box-shadow:0 0 40px rgba(168,85,247,0.2);
+  transform:translateY(-4px);
+}
+.stat-val {
+  font-size:28px; font-weight:900; color:#a855f7;
+  text-shadow:0 0 20px rgba(168,85,247,0.5);
+}
+.stat-lbl { font-size:12px; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:1.5px; margin-top:6px; }
+
+/* Charts */
+.charts-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:32px; }
+.chart-card {
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:20px; padding:24px;
+  transition:all 0.3s;
+}
+.chart-card:hover { border-color:rgba(168,85,247,0.3); box-shadow:0 0 30px rgba(124,58,237,0.15); }
+.chart-card.full { grid-column:1/-1; }
+.chart-title { font-size:15px; font-weight:700; color:rgba(255,255,255,0.8); margin-bottom:16px; }
+
+/* Viral badge */
+.viral-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background:linear-gradient(135deg,rgba(239,68,68,0.2),rgba(249,115,22,0.2));
+  border:1px solid rgba(249,115,22,0.4);
+  border-radius:8px; padding:3px 10px;
+  font-size:11px; font-weight:700; color:#fb923c;
+}
+
+/* Video table */
+.video-table { width:100%; border-collapse:collapse; }
+.video-table th {
+  text-align:left; padding:12px 16px;
+  font-size:11px; text-transform:uppercase; letter-spacing:1px;
+  color:rgba(255,255,255,0.4);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+.video-table td {
+  padding:14px 16px; font-size:14px;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  transition:background 0.2s;
+}
+.video-table tr:hover td { background:rgba(168,85,247,0.05); }
+
+/* Battle section */
+.battle-wrap {
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:20px; padding:32px; margin-bottom:32px;
+}
+.battle-inputs { display:flex; align-items:center; gap:16px; margin-bottom:24px; flex-wrap:wrap; }
+.battle-input {
+  flex:1; min-width:200px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:12px; padding:14px 18px;
+  color:#fff; font-size:14px; font-family:'Inter',sans-serif; outline:none;
+  transition:all 0.3s;
+}
+.battle-input:focus { border-color:#a855f7; box-shadow:0 0 0 3px rgba(168,85,247,0.2); }
+.battle-input::placeholder { color:rgba(255,255,255,0.3); }
+.vs-badge {
+  background:linear-gradient(135deg,#7c3aed,#ec4899);
+  padding:10px 16px; border-radius:10px;
+  font-size:14px; font-weight:900;
+  box-shadow:0 0 20px rgba(124,58,237,0.5);
+}
+.battle-btn {
+  background:linear-gradient(135deg,#7c3aed,#a855f7);
+  border:none; border-radius:12px; padding:14px 28px;
+  color:#fff; font-size:14px; font-weight:700; cursor:pointer;
+  transition:all 0.3s; box-shadow:0 0 20px rgba(124,58,237,0.4);
+}
+.battle-btn:hover { box-shadow:0 0 35px rgba(168,85,247,0.7); transform:translateY(-2px); }
+.battle-results { display:none; }
+.battle-cards { display:grid; grid-template-columns:1fr auto 1fr; gap:20px; align-items:start; }
+.battle-card {
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:16px; padding:24px; transition:all 0.5s;
+}
+.battle-card.winner { border-color:#a855f7; box-shadow:0 0 40px rgba(168,85,247,0.3); }
+.battle-vs { text-align:center; padding-top:20px; font-size:24px; font-weight:900; color:rgba(255,255,255,0.3); }
+.battle-name { font-size:18px; font-weight:800; margin-bottom:16px; }
+.battle-stat { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.06); font-size:14px; }
+.battle-stat-val { font-weight:700; }
+.winner-flag { color:#a855f7; }
+.overall-winner {
+  text-align:center; margin-top:24px;
+  font-size:24px; font-weight:900;
+  background:linear-gradient(135deg,#a855f7,#ec4899);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+
+/* AI Report */
+.ai-btn {
+  width:100%; padding:18px;
+  background:linear-gradient(135deg,#7c3aed,#a855f7,#ec4899);
+  background-size:200% 200%; animation:gradShift 3s ease infinite;
+  border:none; border-radius:14px; color:#fff;
+  font-size:17px; font-weight:700; cursor:pointer;
+  transition:all 0.3s; box-shadow:0 0 30px rgba(124,58,237,0.5);
+  margin-bottom:24px;
+}
+@keyframes gradShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+.ai-btn:hover { box-shadow:0 0 60px rgba(168,85,247,0.8); transform:translateY(-2px); }
+.ai-report {
+  background:rgba(10,10,20,0.8);
+  border:1px solid rgba(79,70,229,0.3);
+  border-radius:20px; padding:32px;
+  box-shadow:0 0 40px rgba(79,70,229,0.15);
+  display:none;
+}
+.ai-section {
+  margin-bottom:24px; padding:20px;
+  background:rgba(255,255,255,0.03);
+  border-left:3px solid #7c3aed;
+  border-radius:0 12px 12px 0;
+  animation:slideIn 0.4s ease both;
+}
+@keyframes slideIn { from{opacity:0;transform:translateX(-20px)} to{opacity:1;transform:translateX(0)} }
+.ai-section-title {
+  font-size:16px; font-weight:800;
+  background:linear-gradient(135deg,#a855f7,#ec4899);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  margin-bottom:10px;
+}
+.ai-section-body { font-size:14px; color:rgba(255,255,255,0.75); line-height:1.9; }
+.ai-section-body strong { color:#a855f7; }
+
+/* Prediction */
+.prediction-cards { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+.pred-card {
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(168,85,247,0.2);
+  border-radius:14px; padding:20px; text-align:center;
+  transition:all 0.3s;
+}
+.pred-card:hover { border-color:#a855f7; box-shadow:0 0 25px rgba(168,85,247,0.2); transform:translateY(-3px); }
+.pred-month { font-size:12px; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+.pred-val { font-size:22px; font-weight:800; color:#a855f7; text-shadow:0 0 15px rgba(168,85,247,0.5); }
+
+/* Loading spinner */
+.spinner {
+  width:40px; height:40px; border:3px solid rgba(168,85,247,0.2);
+  border-top-color:#a855f7; border-radius:50%;
+  animation:spin 0.8s linear infinite; margin:20px auto;
+  display:none;
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+
+.divider {
+  height:1px;
+  background:linear-gradient(90deg,transparent,#7c3aed,#ec4899,#7c3aed,transparent);
+  margin:40px 0; box-shadow:0 0 10px rgba(168,85,247,0.3);
+}
+/* Health meter */
+.health-wrap {
+  display:flex; align-items:center; justify-content:center;
+  flex-direction:column; padding:32px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:20px; margin-bottom:32px;
+}
+.health-canvas-wrap { position:relative; width:220px; height:130px; }
+.health-score-text {
+  position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+  text-align:center;
+}
+.health-score-num {
+  font-size:42px; font-weight:900; color:#a855f7;
+  text-shadow:0 0 30px rgba(168,85,247,0.8);
+}
+.health-score-lbl { font-size:12px; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:1px; }
+.health-grade {
+  font-size:18px; font-weight:800; margin-top:12px;
+  background:linear-gradient(135deg,#a855f7,#ec4899);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+
+/* Best time cards */
+.time-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:32px; }
+.time-card {
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px; padding:20px; text-align:center;
+  transition:all 0.3s;
+}
+.time-card:hover { border-color:#a855f7; box-shadow:0 0 25px rgba(168,85,247,0.2); transform:translateY(-3px); }
+.time-icon { font-size:28px; margin-bottom:8px; }
+.time-title { font-size:13px; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+.time-val { font-size:18px; font-weight:800; color:#a855f7; }
+
+/* Toast */
+.toast {
+  position:fixed; bottom:32px; right:32px; z-index:9999;
+  background:rgba(20,20,35,0.95);
+  border:1px solid rgba(168,85,247,0.4);
+  border-radius:14px; padding:16px 24px;
+  display:flex; align-items:center; gap:12px;
+  box-shadow:0 0 40px rgba(124,58,237,0.3);
+  backdrop-filter:blur(20px);
+  transform:translateY(100px); opacity:0;
+  transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  max-width:360px;
+}
+.toast.show { transform:translateY(0); opacity:1; }
+.toast-icon { font-size:24px; }
+.toast-body { flex:1; }
+.toast-title { font-size:14px; font-weight:700; color:#fff; margin-bottom:2px; }
+.toast-msg { font-size:12px; color:rgba(255,255,255,0.5); }
+
+/* Sparkle */
+.sparkle {
+  position:absolute; pointer-events:none;
+  width:6px; height:6px; border-radius:50%;
+  animation:sparkleAnim 0.8s ease forwards;
+}
+@keyframes sparkleAnim {
+  0%  { transform:scale(0) translate(0,0); opacity:1; }
+  100%{ transform:scale(1) translate(var(--tx),var(--ty)); opacity:0; }
+}
+
+/* Confetti */
+.confetti-piece {
+  position:fixed; width:10px; height:10px;
+  border-radius:2px; pointer-events:none;
+  animation:confettiFall 2s ease forwards;
+  z-index:9999;
+}
+@keyframes confettiFall {
+  0%  { transform:translateY(-20px) rotate(0deg); opacity:1; }
+  100%{ transform:translateY(100vh) rotate(720deg); opacity:0; }
+}
+
+/* Export btn */
+.export-btn {
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.15);
+  color:#fff; border-radius:10px;
+  padding:8px 20px; font-size:13px; font-weight:600;
+  cursor:pointer; transition:all 0.3s;
+}
+.export-btn:hover { background:rgba(168,85,247,0.2); border-color:#a855f7; }
+
+/* Stat counter animation */
+.stat-val { transition:all 0.3s; }
+.stat-card:hover .stat-val { transform:scale(1.1); }
+
+/* Glowing divider pulse */
+.divider { animation:dividerPulse 3s ease-in-out infinite; }
+@keyframes dividerPulse {
+  0%,100%{ opacity:0.5; } 50%{ opacity:1; box-shadow:0 0 20px rgba(168,85,247,0.5); }
+}
+@media print {
+  body { background:#0a0a0f !important; -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+  .bg-animate, #particles, nav { display:none !important; }
+  .page { padding:20px !important; }
+  .stat-card, .chart-card, .channel-header, .battle-wrap, .ai-report, .health-wrap, .time-card, .pred-card {
+    background:#13131f !important; border:1px solid #4c1d95 !important;
+    -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important;
+  }
+  .section-title { color:#a855f7 !important; --webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+  .stat-val { color:#a855f7 !important; }
+}
+
+/* Scroll reveal */
+.reveal { opacity:0; transform:translateY(30px); transition:all 0.6s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+
+/* Live clock */
+.live-clock {
+  font-size:13px; color:rgba(255,255,255,0.4);
+  font-family:'Inter',sans-serif; letter-spacing:1px;
+}
+
+/* Glowing search bar on dashboard */
+.channel-search-mini {
+  display:flex; gap:10px; margin-bottom:32px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px; padding:16px 20px;
+}
+.channel-search-mini input {
+  flex:1; background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:10px; padding:12px 16px;
+  color:#fff; font-size:14px; font-family:'Inter',sans-serif; outline:none;
+  transition:all 0.3s;
+}
+.channel-search-mini input:focus { border-color:#a855f7; box-shadow:0 0 0 3px rgba(168,85,247,0.2); }
+.channel-search-mini input::placeholder { color:rgba(255,255,255,0.3); }
+.mini-search-btn {
+  background:linear-gradient(135deg,#7c3aed,#a855f7);
+  border:none; border-radius:10px; padding:12px 20px;
+  color:#fff; font-size:14px; font-weight:700; cursor:pointer;
+  transition:all 0.3s; box-shadow:0 0 15px rgba(124,58,237,0.4);
+  white-space:nowrap;
+}
+.mini-search-btn:hover { box-shadow:0 0 30px rgba(168,85,247,0.7); transform:translateY(-1px); }
+
+/* Floating action button */
+.fab {
+  position:fixed; bottom:32px; left:32px; z-index:999;
+  width:52px; height:52px; border-radius:50%;
+  background:linear-gradient(135deg,#7c3aed,#ec4899);
+  border:none; cursor:pointer; font-size:22px;
+  box-shadow:0 0 25px rgba(124,58,237,0.5);
+  transition:all 0.3s; display:flex; align-items:center; justify-content:center;
+}
+.fab:hover { transform:scale(1.1) rotate(15deg); box-shadow:0 0 45px rgba(168,85,247,0.8); }
+
+/* Share card */
+.share-card {
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px; padding:20px;
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:32px; flex-wrap:wrap; gap:12px;
+}
+.share-btns { display:flex; gap:10px; flex-wrap:wrap; }
+.share-btn {
+  padding:8px 18px; border-radius:8px; border:none;
+  font-size:13px; font-weight:700; cursor:pointer;
+  transition:all 0.3s;
+}
+.share-btn.twitter  { background:#1da1f2; color:#fff; }
+.share-btn.linkedin { background:#0077b5; color:#fff; }
+.share-btn.copy     { background:rgba(168,85,247,0.2); color:#a855f7; border:1px solid rgba(168,85,247,0.3); }
+.share-btn:hover    { transform:translateY(-2px); filter:brightness(1.2); }
+
+/* Fun fact ticker */
+.ticker-wrap {
+  background:rgba(124,58,237,0.1);
+  border:1px solid rgba(124,58,237,0.2);
+  border-radius:10px; padding:10px 20px;
+  margin-bottom:24px; display:flex; align-items:center; gap:12px;
+  overflow:hidden;
+}
+.ticker-label { font-size:11px; font-weight:700; color:#a855f7; text-transform:uppercase; letter-spacing:1px; white-space:nowrap; }
+.ticker-text { font-size:13px; color:rgba(255,255,255,0.6); animation:tickerScroll 12s linear infinite; white-space:nowrap; }
+@keyframes tickerScroll { 0%{transform:translateX(100%)} 100%{transform:translateX(-100%)} }
+
+/* Revenue Estimator */
+.revenue-card {
+  background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(5,150,105,0.05));
+  border:1px solid rgba(16,185,129,0.25);
+  border-radius:20px; padding:32px; margin-bottom:32px;
+}
+.revenue-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:20px; }
+.rev-item {
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(16,185,129,0.2);
+  border-radius:14px; padding:20px; text-align:center;
+  transition:all 0.3s;
+}
+.rev-item:hover { border-color:#10b981; box-shadow:0 0 25px rgba(16,185,129,0.2); transform:translateY(-3px); }
+.rev-icon { font-size:28px; margin-bottom:8px; }
+.rev-label { font-size:11px; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+.rev-val { font-size:22px; font-weight:800; color:#10b981; text-shadow:0 0 15px rgba(16,185,129,0.5); }
+
+/* Shadow Ban Detector */
+.shadowban-card {
+  border-radius:20px; padding:32px; margin-bottom:32px;
+  transition:all 0.3s;
+}
+.shadowban-card.safe {
+  background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(5,150,105,0.05));
+  border:1px solid rgba(16,185,129,0.3);
+}
+.shadowban-card.warning {
+  background:linear-gradient(135deg,rgba(234,179,8,0.08),rgba(202,138,4,0.05));
+  border:1px solid rgba(234,179,8,0.3);
+}
+.shadowban-card.danger {
+  background:linear-gradient(135deg,rgba(239,68,68,0.08),rgba(220,38,38,0.05));
+  border:1px solid rgba(239,68,68,0.3);
+}
+.shadowban-status {
+  display:flex; align-items:center; gap:16px; margin-bottom:20px;
+}
+.shadowban-icon { font-size:48px; }
+.shadowban-title { font-size:24px; font-weight:900; }
+.shadowban-title.safe    { color:#10b981; text-shadow:0 0 20px rgba(16,185,129,0.5); }
+.shadowban-title.warning { color:#eab308; text-shadow:0 0 20px rgba(234,179,8,0.5); }
+.shadowban-title.danger  { color:#ef4444; text-shadow:0 0 20px rgba(239,68,68,0.5); }
+.shadowban-metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:16px; }
+.sban-metric {
+  background:rgba(255,255,255,0.04);
+  border-radius:12px; padding:16px; text-align:center;
+}
+.sban-metric-val { font-size:20px; font-weight:800; margin-bottom:4px; }
+.sban-metric-lbl { font-size:11px; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:1px; }
+.progress-bar-wrap { margin-top:20px; }
+.progress-label { display:flex; justify-content:space-between; font-size:13px; color:rgba(255,255,255,0.5); margin-bottom:6px; }
+.progress-track { height:8px; background:rgba(255,255,255,0.08); border-radius:4px; overflow:hidden; }
+.progress-fill { height:100%; border-radius:4px; transition:width 1.5s ease; width:0%; }
+
+/* DNA Fingerprint */
+.dna-card {
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:20px; padding:32px;
+  margin-bottom:32px; text-align:center;
+}
+.dna-wrap { display:flex; align-items:center; justify-content:center; gap:48px; flex-wrap:wrap; }
+.dna-labels { display:flex; flex-direction:column; gap:12px; text-align:left; }
+.dna-label-item { display:flex; align-items:center; gap:10px; font-size:13px; color:rgba(255,255,255,0.6); }
+.dna-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+
+/* Niche Detector */
+.niche-card {
+  background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(37,99,235,0.05));
+  border:1px solid rgba(59,130,246,0.25);
+  border-radius:20px; padding:32px;
+  margin-bottom:32px;
+}
+.niche-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-top:20px; }
+.niche-item {
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(59,130,246,0.15);
+  border-radius:14px; padding:20px;
+  transition:all 0.3s;
+}
+.niche-item:hover { border-color:#3b82f6; box-shadow:0 0 20px rgba(59,130,246,0.2); transform:translateY(-2px); }
+.niche-item-title { font-size:12px; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+.niche-item-val { font-size:15px; font-weight:700; color:#93c5fd; line-height:1.5; }
+.niche-badge {
+  display:inline-block;
+  background:linear-gradient(135deg,#3b82f6,#2563eb);
+  padding:6px 16px; border-radius:20px;
+  font-size:14px; font-weight:700;
+  box-shadow:0 0 20px rgba(59,130,246,0.4);
+  margin-bottom:16px;
+}
+</style>
+</head>
+<body>
+<div class="bg-animate"></div>
+
+<nav>
+  <div class="nav-logo">🚀 Socio-Engine-X</div>
+  <div class="nav-right">
+    <button class="export-btn" onclick="exportPDF()">📄 Export PDF</button>
+    <button class="nav-btn" onclick="window.location.href='/home'">← New Search</button>
+    <button class="nav-btn" onclick="window.location.href='/logout'">Logout</button>
+  </div>
+</nav>
+
+<div class="page" id="mainPage" style="display:none">
+ 
+    <!-- Live clock + ticker -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <div style="font-size:13px;color:rgba(255,255,255,0.3)">📊 Dashboard · Live Data</div>
+    <div class="live-clock" id="liveClock"></div>
+  </div>
+  <div class="ticker-wrap">
+    <span class="ticker-label">⚡ Live</span>
+    <span class="ticker-text" id="tickerText">Loading channel insights...</span>
+  </div>
+
+  <!-- Quick search bar -->
+  <div class="channel-search-mini">
+    <input type="text" id="quickSearch" placeholder="🔍  Search another channel instantly...">
+    <button class="mini-search-btn" onclick="quickSearchChannel()">Analyze ↗</button>
+  </div>
+
+  <!-- Channel Header -->
+  <div class="channel-header" id="channelHeader"></div>
+
+  <!-- Stats -->
+  <div class="section-title">📊 Channel Statistics & Metrics</div>
+  <div class="stats-grid" id="statsGrid"></div>
+
+  <div class="divider"></div>
+
+  <!-- Charts -->
+  <div class="section-title">📈 Visual Analytics & Performance Graphs</div>
+  <div class="charts-grid">
+    <div class="chart-card full">
+      <div class="chart-title">Views per Recent Video</div>
+      <div id="chart-views" style="height:320px"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Likes vs Comments</div>
+      <div id="chart-likes" style="height:300px"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Engagement Breakdown</div>
+      <div id="chart-pie" style="height:300px"></div>
+    </div>
+    <div class="chart-card full">
+      <div class="chart-title">Views Trend Line</div>
+      <div id="chart-trend" style="height:280px"></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Recent Videos -->
+  <div class="section-title">🎬 Recent Videos Performance Breakdown</div>
+  <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:16px;overflow:hidden;margin-bottom:32px;">
+    <table class="video-table" id="videoTable"></table>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Growth Prediction -->
+  <div class="section-title">🔮 Growth Prediction (Next 12 Months)</div>
+  <div class="prediction-cards" id="predCards"></div>
+  <div class="chart-card" style="margin-bottom:32px">
+    <div id="chart-predict" style="height:300px"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Health Score -->
+  <div class="section-title">💚 Channel Health Score</div>
+  <div class="health-wrap">
+    <div class="health-canvas-wrap">
+      <canvas id="healthGauge" width="220" height="130"></canvas>
+      <div class="health-score-text">
+        <div class="health-score-num" id="healthNum">0</div>
+        <div class="health-score-lbl">/ 100</div>
+      </div>
+    </div>
+    <div class="health-grade" id="healthGrade"></div>
+  </div>
+
+  <!-- Best Time to Post -->
+  <div class="section-title">⏰ Best Time to Post</div>
+  <div class="time-grid" id="timeGrid"></div>
+
+  <div class="divider"></div>
+
+<!-- Channel DNA Fingerprint -->
+  <div class="section-title">🧬 Channel DNA Fingerprint</div>
+  <div class="dna-card">
+    <div style="font-size:14px;color:rgba(255,255,255,0.4);margin-bottom:24px;">
+      Unique personality radar across 6 dimensions
+    </div>
+    <div class="dna-wrap">
+      <canvas id="dnaCanvas" width="280" height="280"></canvas>
+      <div class="dna-labels" id="dnaLabels"></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Niche Detector -->
+  <div class="section-title">🎯 Niche & Audience Detector</div>
+  <div class="niche-card" id="nicheCard"></div>
+
+  <div class="divider"></div>
+
+<!-- Revenue Estimator -->
+  <div class="section-title">💰 Revenue Estimator</div>
+  <div class="revenue-card" id="revenueCard">
+    <div style="font-size:14px;color:rgba(255,255,255,0.5);margin-bottom:4px;">
+      Estimated monthly ad revenue based on views, engagement and niche
+    </div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.3);margin-bottom:20px;">
+      ⚠️ Estimates only — actual revenue varies by niche, audience location and monetization status
+    </div>
+    <div class="revenue-grid" id="revenueGrid"></div>
+    <div style="margin-top:20px;" id="revenueBar"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Shadow Ban Detector -->
+  <div class="section-title">🔍 Algorithm & Shadow Ban Detector</div>
+  <div id="shadowbanCard"></div>
+
+  <div class="divider"></div>
+
+  <!-- Channel Battle -->
+  <div class="section-title">⚔️ Channel Battle Mode</div>
+  <div class="battle-wrap">
+    <div class="battle-inputs">
+      <input class="battle-input" id="b1" placeholder="Channel 1 — URL or name">
+      <div class="vs-badge">VS</div>
+      <input class="battle-input" id="b2" placeholder="Channel 2 — URL or name">
+      <button class="battle-btn" onclick="runBattle()">⚔️ Battle!</button>
+    </div>
+    <div class="spinner" id="battleSpinner"></div>
+    <div class="battle-results" id="battleResults"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- AI Report -->
+  <div class="section-title">🤖 AI-Powered Growth Analysis & Strategy</div>
+  <button class="ai-btn" id="aiBtn" onclick="generateAI()">✨ Generate AI Growth Report</button>
+  <div class="spinner" id="aiSpinner"></div>
+  <div class="ai-report" id="aiReport"></div>
+
+</div>
+
+<!-- Loading state -->
+<div id="loadingPage" style="position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;background:#0a0a0f">
+  <div style="font-size:52px;margin-bottom:20px;animation:spin 2s linear infinite">🚀</div>
+  <div style="font-size:20px;font-weight:700;margin-bottom:8px">Loading Dashboard</div>
+  <div style="font-size:14px;color:rgba(255,255,255,0.4)" id="loadingMsg">Fetching channel data...</div>
+  <div style="width:200px;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;margin-top:24px;overflow:hidden">
+    <div style="height:100%;background:linear-gradient(90deg,#7c3aed,#ec4899);border-radius:2px;animation:loadBar 1.5s ease infinite"></div>
+  </div>
+</div>
+
+<style>
+@keyframes loadBar { 0%{width:0%} 50%{width:80%} 100%{width:100%} }
+</style>
+
+<script>
+const COLORS = { purple:'#a855f7', pink:'#ec4899', blue:'#3b82f6', teal:'#14b8a6', bg:'#0a0a0f', card:'rgba(255,255,255,0.04)' };
+const PLOTLY_LAYOUT = {
+  paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
+  font:{ family:'Inter', color:'rgba(255,255,255,0.7)', size:12 },
+  margin:{ t:20, b:60, l:50, r:20 },
+  xaxis:{ gridcolor:'rgba(255,255,255,0.06)', linecolor:'rgba(255,255,255,0.1)', tickfont:{color:'rgba(255,255,255,0.5)'} },
+  yaxis:{ gridcolor:'rgba(255,255,255,0.06)', linecolor:'rgba(255,255,255,0.1)', tickfont:{color:'rgba(255,255,255,0.5)'} },
+  showlegend:false
+};
+const PLOTLY_CONFIG = { displayModeBar:false, responsive:true };
+
+let channelData = null;
+
+function fmt(n) {
+  if(n>=1e9) return (n/1e9).toFixed(1)+'B';
+  if(n>=1e6) return (n/1e6).toFixed(1)+'M';
+  if(n>=1e3) return (n/1e3).toFixed(0)+'K';
+  return n.toLocaleString();
+}
+
+function renderAll() {
+  renderHeader();
+  renderStats();
+  renderCharts();
+  renderTable();
+}
+
+function renderHeader() {
+  const d = channelData;
+  const thumb = d.thumbnail
+    ? `<img src="${d.thumbnail}" class="pfp-img" onerror="this.outerHTML='<div class=pfp-fallback>📺</div>'">`
+    : `<div class="pfp-fallback">📺</div>`;
+  document.getElementById('channelHeader').innerHTML = `
+    <div class="pfp-wrap">${thumb}</div>
+    <div class="channel-info">
+      <div class="channel-name">${d.name}</div>
+      <div class="channel-meta">📅 Created: ${d.created_at} &nbsp;|&nbsp; 🌍 Country: ${d.country} &nbsp;|&nbsp; 🎬 ${d.video_count.toLocaleString()} videos</div>
+      <div>${d.description ? `<p style="font-size:14px;color:rgba(255,255,255,0.5);margin-bottom:12px;line-height:1.7">${d.description.substring(0,200)}...</p>` : ''}</div>
+      <span class="badge">⚡ Engagement: ${d.engagement_rate}%</span>
+      <span class="badge" style="background:linear-gradient(135deg,#14b8a6,#0891b2)">📊 ${fmt(d.subscribers)} Subscribers</span>
+    </div>`;
+}
+
+function renderStats() {
+  const d = channelData;
+  const stats = [
+    { val: d.subscribers,     display: fmt(d.subscribers),     lbl: 'Subscribers',        raw: d.subscribers },
+    { val: d.total_views,     display: fmt(d.total_views),     lbl: 'Total Views',        raw: d.total_views },
+    { val: d.avg_views,       display: fmt(d.avg_views),       lbl: 'Avg Views / Video',  raw: d.avg_views },
+    { val: d.engagement_rate, display: d.engagement_rate+'%',  lbl: 'Engagement Rate',    raw: null },
+    { val: d.video_count,     display: d.video_count.toLocaleString(), lbl: 'Total Videos', raw: d.video_count },
+    { val: d.total_likes,     display: fmt(d.total_likes),     lbl: 'Likes (Last 10)',    raw: d.total_likes },
+    { val: d.total_comments,  display: fmt(d.total_comments),  lbl: 'Comments (Last 10)', raw: d.total_comments },
+    { val: d.country,         display: d.country,              lbl: 'Country',            raw: null },
+  ];
+  document.getElementById('statsGrid').innerHTML = stats.map((s,i) => `
+    <div class="stat-card" style="animation:fadeUp 0.4s ease ${i*0.07}s both">
+      <div class="stat-val" data-final="${s.display}" data-raw="${s.raw}">${s.display}</div>
+      <div class="stat-lbl">${s.lbl}</div>
+    </div>`).join('');
+}
+
+function renderCharts() {
+  const d = channelData;
+  const vids = d.recent_videos || [];
+  const titles = vids.map(v=>v.title.length>20?v.title.substring(0,20)+'...':v.title);
+  const views  = vids.map(v=>v.views);
+  const likes  = vids.map(v=>v.likes);
+  const cmts   = vids.map(v=>v.comments);
+
+  // Views bar
+  Plotly.newPlot('chart-views',[{
+    x:titles, y:views, type:'bar',
+    marker:{ color:views.map((_,i)=>i%2===0?COLORS.purple:COLORS.pink), opacity:0.9 },
+    text:views.map(fmt), textposition:'outside', textfont:{color:'rgba(255,255,255,0.8)',size:11},
+    hovertemplate:'<b>%{x}</b><br>Views: %{text}<extra></extra>'
+  }], {...PLOTLY_LAYOUT, margin:{t:20,b:80,l:50,r:20},
+    xaxis:{...PLOTLY_LAYOUT.xaxis,tickangle:-35}}, PLOTLY_CONFIG);
+
+  // Likes vs Comments grouped bar
+  Plotly.newPlot('chart-likes',[
+    { x:titles, y:likes, name:'Likes', type:'bar', marker:{color:COLORS.purple,opacity:0.9},
+      hovertemplate:'<b>%{x}</b><br>Likes: %{y:,}<extra></extra>' },
+    { x:titles, y:cmts, name:'Comments', type:'bar', marker:{color:COLORS.pink,opacity:0.9},
+      hovertemplate:'<b>%{x}</b><br>Comments: %{y:,}<extra></extra>' }
+  ], {...PLOTLY_LAYOUT, barmode:'group', showlegend:true,
+    legend:{font:{color:'rgba(255,255,255,0.6)'},bgcolor:'rgba(0,0,0,0)'},
+    xaxis:{...PLOTLY_LAYOUT.xaxis,tickangle:-35}}, PLOTLY_CONFIG);
+
+  // Pie
+  const totalVV = views.reduce((a,b)=>a+b,0);
+  const totalL  = d.total_likes;
+  const totalC  = d.total_comments;
+  Plotly.newPlot('chart-pie',[{
+    labels:['Likes','Comments','Views only'],
+    values:[totalL, totalC, Math.max(totalVV-totalL-totalC,0)],
+    type:'pie',
+    marker:{colors:[COLORS.purple,COLORS.pink,'rgba(255,255,255,0.1)']},
+    hole:0.4,
+    textfont:{color:'#fff',size:12},
+    hovertemplate:'<b>%{label}</b><br>%{percent}<extra></extra>'
+  }],{...PLOTLY_LAYOUT,margin:{t:20,b:20,l:20,r:20},showlegend:true,
+    legend:{font:{color:'rgba(255,255,255,0.6)'},bgcolor:'rgba(0,0,0,0)',orientation:'h',y:-0.15}},
+    PLOTLY_CONFIG);
+
+  // Trend line
+  Plotly.newPlot('chart-trend',[{
+    x:titles, y:views, type:'scatter', mode:'lines+markers',
+    line:{color:COLORS.purple, width:3, shape:'spline'},
+    marker:{color:COLORS.pink, size:8, line:{color:'#fff',width:1.5}},
+    fill:'tozeroy', fillcolor:'rgba(124,58,237,0.1)',
+    hovertemplate:'<b>%{x}</b><br>Views: %{y:,}<extra></extra>'
+  }],{...PLOTLY_LAYOUT, xaxis:{...PLOTLY_LAYOUT.xaxis,tickangle:-35}}, PLOTLY_CONFIG);
+}
+
+function renderTable() {
+  const vids = channelData.recent_videos || [];
+  const avgViews = vids.reduce((a,v)=>a+v.views,0)/Math.max(vids.length,1);
+  document.getElementById('videoTable').innerHTML = `
+    <thead><tr>
+      <th>#</th><th>Title</th><th>Views</th><th>Likes</th><th>Comments</th><th>Status</th>
+    </tr></thead>
+    <tbody>${vids.map((v,i)=>{
+      const isViral = v.views > avgViews*1.5;
+      return `<tr>
+        <td style="color:rgba(255,255,255,0.3)">${i+1}</td>
+        <td style="font-weight:600;max-width:300px">${v.title}</td>
+        <td style="color:#a855f7;font-weight:700">${fmt(v.views)}</td>
+        <td>${fmt(v.likes)}</td>
+        <td>${fmt(v.comments)}</td>
+        <td>${isViral?'<span class="viral-badge">🔥 Viral</span>':'<span style="font-size:12px;color:rgba(255,255,255,0.3)">Normal</span>'}</td>
+      </tr>`;
+    }).join('')}</tbody>`;
+}
+
+async function loadPrediction() {
+  const res = await fetch('/api/predict',{
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({channel_data:channelData})
+  });
+  const data = await res.json();
+  if(!data.success) return;
+  const p = data.data;
+  const labels = ['1 Month','3 Months','6 Months','12 Months'];
+  document.getElementById('predCards').innerHTML = p.predicted_subs.map((val,i)=>`
+    <div class="pred-card">
+      <div class="pred-month">${labels[i]}</div>
+      <div class="pred-val">${fmt(val)}</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px">subscribers</div>
+    </div>`).join('');
+
+  Plotly.newPlot('chart-predict',[
+    { x:['Now',...labels], y:[p.current,...p.predicted_subs],
+      type:'scatter', mode:'lines+markers',
+      name:'Predicted Subscribers',
+      line:{color:COLORS.purple, width:3, dash:'dot'},
+      marker:{color:COLORS.pink, size:10, symbol:'star'},
+      fill:'tozeroy', fillcolor:'rgba(124,58,237,0.08)',
+      hovertemplate:'<b>%{x}</b><br>Subscribers: %{y:,}<extra></extra>'
+    }
+  ],{...PLOTLY_LAYOUT,
+    annotations:[{
+      x:'12 Months', y:p.predicted_subs[3],
+      text:'📈 Predicted', showarrow:true, arrowcolor:COLORS.purple,
+      font:{color:COLORS.purple, size:12}, bgcolor:'rgba(124,58,237,0.2)', borderpad:4
+    }]
+  }, PLOTLY_CONFIG);
+}
+
+async function runBattle() {
+  const ch1 = document.getElementById('b1').value.trim();
+  const ch2 = document.getElementById('b2').value.trim();
+  if(!ch1||!ch2){ alert('Please enter both channel names'); return; }
+
+  document.getElementById('battleSpinner').style.display='block';
+  document.getElementById('battleResults').style.display='none';
+
+  let d1, d2;
+
+  // Fetch channel 1
+  try {
+    const r1 = await fetch('/api/channel',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      credentials:'same-origin',
+      body:JSON.stringify({channel:ch1})
+    });
+    const j1 = await r1.json();
+    if(!j1.success){ alert('Channel 1 not found: '+ch1); document.getElementById('battleSpinner').style.display='none'; return; }
+    d1 = j1.data;
+  } catch(e) {
+    alert('Failed to fetch channel 1. Check internet connection.');
+    document.getElementById('battleSpinner').style.display='none';
+    return;
+  }
+
+  // Fetch channel 2
+  try {
+    const r2 = await fetch('/api/channel',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      credentials:'same-origin',
+      body:JSON.stringify({channel:ch2})
+    });
+    const j2 = await r2.json();
+    if(!j2.success){ alert('Channel 2 not found: '+ch2); document.getElementById('battleSpinner').style.display='none'; return; }
+    d2 = j2.data;
+  } catch(e) {
+    alert('Failed to fetch channel 2. Check internet connection.');
+    document.getElementById('battleSpinner').style.display='none';
+    return;
+  }
+
+  document.getElementById('battleSpinner').style.display='none';
+
+  // Compare
+  const w = {
+    subscribers:    d1.subscribers    >= d2.subscribers    ? 1 : 2,
+    total_views:    d1.total_views     >= d2.total_views     ? 1 : 2,
+    engagement:     d1.engagement_rate >= d2.engagement_rate ? 1 : 2,
+    avg_views:      d1.avg_views       >= d2.avg_views       ? 1 : 2,
+    video_count:    d1.video_count     >= d2.video_count     ? 1 : 2,
+  };
+  const w1 = Object.values(w).filter(v=>v===1).length;
+  const w2 = Object.values(w).filter(v=>v===2).length;
+  const ow = w1 >= w2 ? 1 : 2;
+
+  document.getElementById('battleResults').innerHTML = `
+    <div class="battle-cards">
+      <div class="battle-card ${ow===1?'winner':''}">
+        ${ow===1?'<div style="text-align:center;margin-bottom:12px;font-size:24px">👑 Winner</div>':''}
+        <div class="battle-name">${d1.name}</div>
+        <div class="battle-stat"><span>Subscribers</span><span class="battle-stat-val ${w.subscribers===1?'winner-flag':''}">${w.subscribers===1?'✓ ':''}${fmt(d1.subscribers)}</span></div>
+        <div class="battle-stat"><span>Total Views</span><span class="battle-stat-val ${w.total_views===1?'winner-flag':''}">${w.total_views===1?'✓ ':''}${fmt(d1.total_views)}</span></div>
+        <div class="battle-stat"><span>Engagement</span><span class="battle-stat-val ${w.engagement===1?'winner-flag':''}">${w.engagement===1?'✓ ':''}${d1.engagement_rate}%</span></div>
+        <div class="battle-stat"><span>Avg Views</span><span class="battle-stat-val ${w.avg_views===1?'winner-flag':''}">${w.avg_views===1?'✓ ':''}${fmt(d1.avg_views)}</span></div>
+        <div class="battle-stat"><span>Videos</span><span class="battle-stat-val ${w.video_count===1?'winner-flag':''}">${w.video_count===1?'✓ ':''}${d1.video_count}</span></div>
+      </div>
+      <div class="battle-vs" style="padding-top:40px;font-size:32px">⚔️</div>
+      <div class="battle-card ${ow===2?'winner':''}">
+        ${ow===2?'<div style="text-align:center;margin-bottom:12px;font-size:24px">👑 Winner</div>':''}
+        <div class="battle-name">${d2.name}</div>
+        <div class="battle-stat"><span>Subscribers</span><span class="battle-stat-val ${w.subscribers===2?'winner-flag':''}">${w.subscribers===2?'✓ ':''}${fmt(d2.subscribers)}</span></div>
+        <div class="battle-stat"><span>Total Views</span><span class="battle-stat-val ${w.total_views===2?'winner-flag':''}">${w.total_views===2?'✓ ':''}${fmt(d2.total_views)}</span></div>
+        <div class="battle-stat"><span>Engagement</span><span class="battle-stat-val ${w.engagement===2?'winner-flag':''}">${w.engagement===2?'✓ ':''}${d2.engagement_rate}%</span></div>
+        <div class="battle-stat"><span>Avg Views</span><span class="battle-stat-val ${w.avg_views===2?'winner-flag':''}">${w.avg_views===2?'✓ ':''}${fmt(d2.avg_views)}</span></div>
+        <div class="battle-stat"><span>Videos</span><span class="battle-stat-val ${w.video_count===2?'winner-flag':''}">${w.video_count===2?'✓ ':''}${d2.video_count}</span></div>
+      </div>
+    </div>
+    <div class="overall-winner" style="margin-top:24px;text-align:center;font-size:22px;font-weight:900">
+      🏆 Overall Winner: ${ow===1?d1.name:d2.name}
+    </div>`;
+
+  document.getElementById('battleResults').style.display='block';
+  launchConfetti();
+  showToast('🏆','Battle Complete!','Winner: '+(ow===1?d1.name:d2.name));
+}
+ 
+async function generateAI() {
+  document.getElementById('aiBtn').style.display='none';
+  document.getElementById('aiSpinner').style.display='block';
+  document.getElementById('aiReport').style.display='none';
+  const res = await fetch('/api/ai',{
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({channel_data:channelData})
+  });
+  const data = await res.json();
+  document.getElementById('aiSpinner').style.display='none';
+  if(!data.success){
+    document.getElementById('aiBtn').style.display='block';
+    alert('AI analysis failed. Try again.');
+    return;
+  }
+  const raw = data.tips;
+  const sections = raw.split(/\n(?=\d\.|\d\))/g).filter(s=>s.trim());
+  const icons = ['🎯','💚','🚀','📅','⚡','⚠️'];
+  document.getElementById('aiReport').innerHTML = sections.map((sec,i)=>{
+    const lines = sec.trim().split('\n');
+    const title = lines[0].replace(/^\d[\.\)]\s*/,'').replace(/\*\*/g,'').trim();
+    const body  = lines.slice(1).join('\n').trim()
+      .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+      .replace(/\n/g,'<br>');
+    return `<div class="ai-section" style="animation-delay:${i*0.1}s">
+      <div class="ai-section-title">${icons[i]||'📌'} ${title}</div>
+      <div class="ai-section-body">${body}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('aiReport').style.display='block';
+  document.getElementById('aiBtn').textContent='🔄 Regenerate Report';
+  document.getElementById('aiBtn').style.display='block';
+  document.getElementById('aiBtn').onclick=generateAI;
+}
+
+// ── TOAST ──
+function showToast(icon, title, msg, duration=3500) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastIcon').textContent  = icon;
+  document.getElementById('toastTitle').textContent = title;
+  document.getElementById('toastMsg').textContent   = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
+
+// ── HEALTH GAUGE ──
+function drawHealthGauge(score) {
+  const canvas = document.getElementById('healthGauge');
+  const ctx    = canvas.getContext('2d');
+  const cx = 110, cy = 120, r = 90;
+  const startAngle = Math.PI, endAngle = 2 * Math.PI;
+  const scoreAngle = startAngle + (score / 100) * Math.PI;
+
+  ctx.clearRect(0, 0, 220, 130);
+
+  // Background arc
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, startAngle, endAngle);
+  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+  ctx.lineWidth = 18; ctx.lineCap = 'round';
+  ctx.stroke();
+
+  // Color zones
+  const zones = [
+    [0,   0.3, '#ef4444'],
+    [0.3, 0.6, '#eab308'],
+    [0.6, 0.8, '#22c55e'],
+    [0.8, 1.0, '#a855f7'],
+  ];
+  zones.forEach(([s,e,color]) => {
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, startAngle + s*Math.PI, startAngle + e*Math.PI);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 18; ctx.lineCap = 'round';
+    ctx.globalAlpha = 0.35;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  });
+
+  // Score arc animated
+  let current = 0;
+  const target = score;
+  const anim = setInterval(() => {
+    ctx.clearRect(0, 0, 220, 130);
+
+    // BG
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, startAngle, endAngle);
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = 18; ctx.lineCap = 'round'; ctx.stroke();
+
+    // Zones
+    zones.forEach(([s,e,color]) => {
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, startAngle + s*Math.PI, startAngle + e*Math.PI);
+      ctx.strokeStyle = color; ctx.lineWidth = 18; ctx.lineCap = 'round';
+      ctx.globalAlpha = 0.35; ctx.stroke(); ctx.globalAlpha = 1;
+    });
+
+    // Score fill
+    const color = current < 30 ? '#ef4444' : current < 60 ? '#eab308' : current < 80 ? '#22c55e' : '#a855f7';
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, startAngle, startAngle + (current/100)*Math.PI);
+    ctx.strokeStyle = color; ctx.lineWidth = 18; ctx.lineCap = 'round';
+    ctx.shadowColor = color; ctx.shadowBlur = 15;
+    ctx.stroke(); ctx.shadowBlur = 0;
+
+    // Counter
+    document.getElementById('healthNum').textContent = Math.floor(current);
+
+    current += 1.5;
+    if (current >= target) {
+      clearInterval(anim);
+      document.getElementById('healthNum').textContent = Math.floor(target);
+    }
+  }, 16);
+
+  const grade = score >= 80 ? '🔥 Excellent Channel!' : score >= 60 ? '✅ Healthy Channel' : score >= 40 ? '⚠️ Needs Improvement' : '❌ Critical — Take Action';
+  document.getElementById('healthGrade').textContent = grade;
+}
+
+function calculateHealth(d) {
+  let score = 0;
+  if (d.subscribers  > 1000000) score += 25;
+  else if (d.subscribers > 100000) score += 18;
+  else if (d.subscribers > 10000)  score += 12;
+  else score += 5;
+  if (d.engagement_rate > 6) score += 25;
+  else if (d.engagement_rate > 3) score += 18;
+  else if (d.engagement_rate > 1) score += 10;
+  else score += 3;
+  if (d.avg_views > 500000) score += 25;
+  else if (d.avg_views > 100000) score += 18;
+  else if (d.avg_views > 10000)  score += 12;
+  else score += 5;
+  if (d.video_count > 200) score += 15;
+  else if (d.video_count > 50) score += 10;
+  else score += 5;
+  const ratio = d.total_likes / Math.max(d.total_views / 100, 1);
+  if (ratio > 5) score += 10;
+  else if (ratio > 2) score += 7;
+  else score += 3;
+  return Math.min(score, 100);
+}
+
+// ── BEST TIME TO POST ──
+function renderBestTime(d) {
+  const vids = d.recent_videos || [];
+  const topVideo  = vids.reduce((a,b) => b.views > a.views ? b : a, vids[0] || {});
+  const avgViews  = vids.reduce((a,b) => a+b.views,0) / Math.max(vids.length,1);
+  const postFreq  = d.video_count > 200 ? 'Daily' : d.video_count > 100 ? '3-4x / week' : d.video_count > 50 ? '2x / week' : '1x / week';
+  const engTip    = d.engagement_rate > 5 ? 'Keep current strategy' : d.engagement_rate > 2 ? 'Add stronger CTAs' : 'Engage comments actively';
+  const days = ['Monday & Thursday', 'Tuesday & Friday', 'Wednesday & Saturday', 'Thursday & Sunday'];
+  const bestDay = days[Math.floor(Math.random() * days.length)];
+
+  document.getElementById('timeGrid').innerHTML = `
+    <div class="time-card">
+      <div class="time-icon">📅</div>
+      <div class="time-title">Best Days</div>
+      <div class="time-val">${bestDay}</div>
+    </div>
+    <div class="time-card">
+      <div class="time-icon">⏱️</div>
+      <div class="time-title">Post Frequency</div>
+      <div class="time-val">${postFreq}</div>
+    </div>
+    <div class="time-card">
+      <div class="time-icon">💬</div>
+      <div class="time-title">Engagement Tip</div>
+      <div class="time-val" style="font-size:14px">${engTip}</div>
+    </div>`;
+}
+
+// ── SPARKLE on PFP hover ──
+function addSparkles() {
+  const pfp = document.querySelector('.pfp-img, .pfp-fallback');
+  if (!pfp) return;
+  pfp.addEventListener('mouseenter', () => {
+    for (let i = 0; i < 12; i++) {
+      const spark = document.createElement('div');
+      spark.className = 'sparkle';
+      const angle = (i / 12) * 360;
+      const dist  = 50 + Math.random() * 40;
+      spark.style.cssText = `
+        left:${pfp.offsetLeft + 55}px; top:${pfp.offsetTop + 55}px;
+        background:${Math.random()>0.5?'#a855f7':'#ec4899'};
+        --tx:${Math.cos(angle*Math.PI/180)*dist}px;
+        --ty:${Math.sin(angle*Math.PI/180)*dist}px;`;
+      pfp.parentElement.appendChild(spark);
+      setTimeout(() => spark.remove(), 800);
+    }
+  });
+}
+
+// ── CONFETTI ──
+function launchConfetti() {
+  const colors = ['#a855f7','#ec4899','#3b82f6','#22c55e','#eab308','#f472b6'];
+  for (let i = 0; i < 80; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti-piece';
+    c.style.cssText = `
+      left:${Math.random()*100}vw;
+      top:-20px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      width:${6+Math.random()*8}px;
+      height:${6+Math.random()*8}px;
+      animation-delay:${Math.random()*1}s;
+      animation-duration:${1.5+Math.random()*1.5}s;`;
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 3000);
+  }
+}
+
+// ── EXPORT PDF ──
+function exportPDF() {
+  showToast('📄', 'Exporting...', 'Opening print dialog for PDF export');
+  setTimeout(() => window.print(), 500);
+}
+
+// ── COUNTER ANIMATION ──
+function animateStatCards() {
+  document.querySelectorAll('.stat-val').forEach(el => {
+    const raw = parseFloat(el.dataset.raw);
+    if (isNaN(raw) || raw === 0) return;
+    const final = el.dataset.final || el.textContent;
+    const suffix = final.replace(/[\d,. ]/g,'');
+    let cur = 0;
+    const step = raw / 45;
+    const timer = setInterval(() => {
+      cur += step;
+      if (cur >= raw) {
+        el.textContent = final;
+        clearInterval(timer);
+        return;
+      }
+      el.textContent = fmt(Math.floor(cur)) + (suffix && !final.includes(suffix) ? '' : '');
+    }, 20);
+  });
+}
+
+// ── REVENUE ESTIMATOR ──
+function renderRevenue(d) {
+  const monthlyViews = d.avg_views * 2;
+
+  // CPM ranges by engagement
+  let cpmLow, cpmMid, cpmHigh;
+  if (d.engagement_rate > 6) {
+    cpmLow = 3; cpmMid = 6; cpmHigh = 12;
+  } else if (d.engagement_rate > 3) {
+    cpmLow = 2; cpmMid = 4; cpmHigh = 8;
+  } else {
+    cpmLow = 1; cpmMid = 2.5; cpmHigh = 5;
+  }
+
+  // Revenue = (views / 1000) * CPM * 0.45 (YouTube takes 55%)
+  const calc = (cpm) => Math.round((monthlyViews / 1000) * cpm * 0.45);
+  const low  = calc(cpmLow);
+  const mid  = calc(cpmMid);
+  const high = calc(cpmHigh);
+
+  // Annual
+  const annualLow  = low  * 12;
+  const annualHigh = high * 12;
+
+  // Per video estimate
+  const perVideo = Math.round((d.avg_views / 1000) * cpmMid * 0.45);
+
+  document.getElementById('revenueGrid').innerHTML = `
+    <div class="rev-item">
+      <div class="rev-icon">📉</div>
+      <div class="rev-label">Monthly Low Est.</div>
+      <div class="rev-val">$${low.toLocaleString()}</div>
+    </div>
+    <div class="rev-item" style="border-color:rgba(16,185,129,0.5);box-shadow:0 0 20px rgba(16,185,129,0.15)">
+      <div class="rev-icon">💰</div>
+      <div class="rev-label">Monthly Mid Est.</div>
+      <div class="rev-val" style="font-size:28px">$${mid.toLocaleString()}</div>
+    </div>
+    <div class="rev-item">
+      <div class="rev-icon">📈</div>
+      <div class="rev-label">Monthly High Est.</div>
+      <div class="rev-val">$${high.toLocaleString()}</div>
+    </div>
+    <div class="rev-item">
+      <div class="rev-icon">🎬</div>
+      <div class="rev-label">Per Video Est.</div>
+      <div class="rev-val">$${perVideo.toLocaleString()}</div>
+    </div>
+    <div class="rev-item">
+      <div class="rev-icon">📅</div>
+      <div class="rev-label">Annual Low Est.</div>
+      <div class="rev-val">$${annualLow.toLocaleString()}</div>
+    </div>
+    <div class="rev-item">
+      <div class="rev-icon">🏆</div>
+      <div class="rev-label">Annual High Est.</div>
+      <div class="rev-val">$${annualHigh.toLocaleString()}</div>
+    </div>`;
+
+  // Progress bar showing potential
+  const potential = Math.min(Math.round((mid / 10000) * 100), 100);
+  document.getElementById('revenueBar').innerHTML = `
+    <div class="progress-bar-wrap">
+      <div class="progress-label">
+        <span>Monetization Potential</span>
+        <span style="color:#10b981;font-weight:700">${potential}%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="revProgressFill"
+          style="background:linear-gradient(90deg,#10b981,#059669)"></div>
+      </div>
+    </div>`;
+  setTimeout(() => {
+    const fill = document.getElementById('revProgressFill');
+    if(fill) fill.style.width = potential + '%';
+  }, 300);
+}
+
+// ── SHADOW BAN DETECTOR ──
+function renderShadowBan(d) {
+  const subs    = d.subscribers;
+  const views   = d.avg_views;
+  const engage  = d.engagement_rate;
+  const videos  = d.video_count;
+
+  // Expected view ratio for healthy channel
+  const expectedRatio = subs > 1000000 ? 0.10 :
+                        subs > 100000  ? 0.15 :
+                        subs > 10000   ? 0.20 : 0.25;
+
+  const actualRatio   = views / Math.max(subs, 1);
+  const ratioScore    = Math.min((actualRatio / expectedRatio) * 100, 100);
+
+  // Engagement health
+  const engageScore = engage > 5 ? 100 : engage > 3 ? 75 : engage > 1 ? 50 : 25;
+
+  // Overall algorithm health score
+  const overallScore = Math.round((ratioScore * 0.6) + (engageScore * 0.4));
+
+  let status, icon, titleClass, description, suggestions;
+
+  if (overallScore >= 70) {
+    status      = 'Channel looks healthy!';
+    icon        = '✅';
+    titleClass  = 'safe';
+    description = 'Your channel shows no signs of algorithm suppression. Views-to-subscriber ratio and engagement are both within healthy ranges.';
+    suggestions = [
+      '🟢 Keep posting consistently to maintain algorithm favor',
+      '🟢 Engagement rate is healthy — keep replying to comments',
+      '🟢 No signs of shadow ban or suppression detected',
+    ];
+  } else if (overallScore >= 45) {
+    status      = 'Possible Algorithm Suppression';
+    icon        = '⚠️';
+    titleClass  = 'warning';
+    description = 'Some metrics suggest your content may be getting reduced distribution. This could be due to irregular posting, low watch time, or audience mismatch.';
+    suggestions = [
+      '🟡 Post more consistently — irregular uploads hurt algorithm ranking',
+      '🟡 Improve thumbnail CTR — aim for 5-10% click-through rate',
+      '🟡 Focus on watch time — longer average view duration boosts reach',
+      '🟡 Engage with comments in the first 30 minutes after posting',
+    ];
+  } else {
+    status      = 'High Risk of Shadow Ban';
+    icon        = '🚨';
+    titleClass  = 'danger';
+    description = 'Views are significantly lower than expected for this subscriber count. The channel may be suppressed by the algorithm or experiencing a shadow ban.';
+    suggestions = [
+      '🔴 Review recent content for potential policy violations',
+      '🔴 Check YouTube Studio for any warnings or strikes',
+      '🔴 Avoid using banned hashtags or misleading titles',
+      '🔴 Consider appealing to YouTube if you believe this is an error',
+      '🔴 Post high-quality content consistently for 30 days to recover',
+    ];
+  }
+
+  document.getElementById('shadowbanCard').innerHTML = `
+    <div class="shadowban-card ${titleClass}">
+      <div class="shadowban-status">
+        <div class="shadowban-icon">${icon}</div>
+        <div>
+          <div class="shadowban-title ${titleClass}">${status}</div>
+          <div style="font-size:14px;color:rgba(255,255,255,0.5);margin-top:4px">${description}</div>
+        </div>
+      </div>
+
+      <div class="shadowban-metrics">
+        <div class="sban-metric">
+          <div class="sban-metric-val" style="color:${ratioScore>70?'#10b981':ratioScore>45?'#eab308':'#ef4444'}">${Math.round(ratioScore)}%</div>
+          <div class="sban-metric-lbl">View Ratio Score</div>
+        </div>
+        <div class="sban-metric">
+          <div class="sban-metric-val" style="color:${engageScore>70?'#10b981':engageScore>45?'#eab308':'#ef4444'}">${engageScore}%</div>
+          <div class="sban-metric-lbl">Engagement Score</div>
+        </div>
+        <div class="sban-metric">
+          <div class="sban-metric-val" style="color:${overallScore>70?'#10b981':overallScore>45?'#eab308':'#ef4444'}">${overallScore}%</div>
+          <div class="sban-metric-lbl">Algorithm Health</div>
+        </div>
+        <div class="sban-metric">
+          <div class="sban-metric-val" style="color:#a855f7">${(actualRatio*100).toFixed(1)}%</div>
+          <div class="sban-metric-lbl">Views / Subs Ratio</div>
+        </div>
+      </div>
+
+      <div class="progress-bar-wrap" style="margin-top:20px">
+        <div class="progress-label">
+          <span>Algorithm Health Score</span>
+          <span style="color:${overallScore>70?'#10b981':overallScore>45?'#eab308':'#ef4444'};font-weight:700">${overallScore}/100</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="sbanFill"
+            style="background:linear-gradient(90deg,${overallScore>70?'#10b981,#059669':overallScore>45?'#eab308,#ca8a04':'#ef4444,#dc2626'})">
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:24px">
+        <div style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.7);margin-bottom:12px">
+          💡 Recommendations
+        </div>
+        ${suggestions.map(s=>`
+          <div style="font-size:14px;color:rgba(255,255,255,0.6);padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);line-height:1.6">
+            ${s}
+          </div>`).join('')}
+      </div>
+    </div>`;
+
+  setTimeout(() => {
+    const fill = document.getElementById('sbanFill');
+    if(fill) fill.style.width = overallScore + '%';
+  }, 300);
+}
+
+// ── CHANNEL DNA FINGERPRINT ──
+function renderDNA(d) {
+  const canvas = document.getElementById('dnaCanvas');
+  const ctx    = canvas.getContext('2d');
+  const cx = 140, cy = 140, maxR = 110;
+  const sides = 6;
+
+  // Calculate scores 0-100
+  const entertainment = Math.min(Math.round((d.avg_views / Math.max(d.subscribers, 1)) * 100 * 8), 100);
+  const consistency   = Math.min(Math.round((d.video_count / 500) * 100), 100);
+  const engagement    = Math.min(Math.round(d.engagement_rate * 12), 100);
+  const growth        = Math.min(Math.round((d.subscribers / 1000000) * 50 + 20), 100);
+  const viral         = Math.min(Math.round(entertainment * 0.6 + engagement * 0.4), 100);
+  const education     = Math.min(Math.round(consistency * 0.5 + growth * 0.5), 100);
+
+  const scores = [entertainment, consistency, engagement, growth, viral, education];
+  const labels = ['Entertainment','Consistency','Engagement','Growth','Viral Potential','Education'];
+  const colors = ['#a855f7','#ec4899','#3b82f6','#10b981','#f59e0b','#ef4444'];
+  const angles = scores.map((_,i) => (i * 2 * Math.PI / sides) - Math.PI/2);
+
+  ctx.clearRect(0, 0, 280, 280);
+
+  // Draw background grid
+  for (let level = 1; level <= 5; level++) {
+    const r = (maxR / 5) * level;
+    ctx.beginPath();
+    for (let i = 0; i < sides; i++) {
+      const a = (i * 2 * Math.PI / sides) - Math.PI/2;
+      const x = cx + r * Math.cos(a);
+      const y = cy + r * Math.sin(a);
+      i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Draw axis lines
+  for (let i = 0; i < sides; i++) {
+    const a = angles[i];
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + maxR * Math.cos(a), cy + maxR * Math.sin(a));
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Animate DNA fill
+  let progress = 0;
+  const anim = setInterval(() => {
+    ctx.clearRect(0, 0, 280, 280);
+
+    // Redraw grid
+    for (let level = 1; level <= 5; level++) {
+      const r = (maxR / 5) * level;
+      ctx.beginPath();
+      for (let i = 0; i < sides; i++) {
+        const a = (i * 2 * Math.PI / sides) - Math.PI/2;
+        const x = cx + r * Math.cos(a);
+        const y = cy + r * Math.sin(a);
+        i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+      ctx.lineWidth = 1; ctx.stroke();
+    }
+    for (let i = 0; i < sides; i++) {
+      const a = angles[i];
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + maxR * Math.cos(a), cy + maxR * Math.sin(a));
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.lineWidth = 1; ctx.stroke();
+    }
+
+    // Draw animated fill
+    const eased = progress < 1 ? progress : 1;
+    ctx.beginPath();
+    for (let i = 0; i < sides; i++) {
+      const r = (scores[i] / 100) * maxR * eased;
+      const x = cx + r * Math.cos(angles[i]);
+      const y = cy + r * Math.sin(angles[i]);
+      i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(168,85,247,0.15)';
+    ctx.fill();
+    ctx.strokeStyle = '#a855f7';
+    ctx.lineWidth = 2.5;
+    ctx.shadowColor = '#a855f7';
+    ctx.shadowBlur = 10;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Draw dots
+    for (let i = 0; i < sides; i++) {
+      const r = (scores[i] / 100) * maxR * eased;
+      const x = cx + r * Math.cos(angles[i]);
+      const y = cy + r * Math.sin(angles[i]);
+      ctx.beginPath();
+      ctx.arc(x, y, 5, 0, Math.PI*2);
+      ctx.fillStyle = colors[i];
+      ctx.shadowColor = colors[i];
+      ctx.shadowBlur = 8;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    progress += 0.035;
+    if (progress >= 1) clearInterval(anim);
+  }, 16);
+
+  // Labels
+  document.getElementById('dnaLabels').innerHTML = labels.map((lbl,i) => `
+    <div class="dna-label-item">
+      <div class="dna-dot" style="background:${colors[i]};box-shadow:0 0 6px ${colors[i]}"></div>
+      <span>${lbl}</span>
+      <span style="margin-left:auto;font-weight:700;color:${colors[i]}">${scores[i]}%</span>
+    </div>`).join('');
+}
+
+// ── NICHE DETECTOR ──
+function renderNiche(d) {
+  const subs   = d.subscribers;
+  const eng    = d.engagement_rate;
+  const views  = d.avg_views;
+  const vids   = d.video_count;
+  const desc   = (d.description || '').toLowerCase();
+
+  // Detect niche from description keywords
+  const niches = [
+    { name:'🎮 Gaming',        keys:['gaming','game','gameplay','play','stream','fortnite','minecraft','pubg','valorant'] },
+    { name:'🎵 Music',         keys:['music','song','cover','lyrics','singer','band','official','audio','vevo'] },
+    { name:'✈️ Travel',        keys:['travel','vlog','trip','tour','explore','adventure','country','world','destination'] },
+    { name:'🍳 Food',          keys:['food','recipe','cook','kitchen','eat','restaurant','taste','chef'] },
+    { name:'💪 Fitness',       keys:['fitness','gym','workout','health','exercise','yoga','weight','training'] },
+    { name:'💻 Technology',    keys:['tech','technology','review','unbox','gadget','phone','computer','software'] },
+    { name:'📚 Education',     keys:['learn','education','tutorial','how to','explain','science','history','study'] },
+    { name:'😂 Entertainment', keys:['funny','comedy','prank','challenge','reaction','entertainment','viral'] },
+    { name:'💰 Finance',       keys:['money','finance','invest','stock','crypto','business','wealth','trading'] },
+    { name:'🎨 Creative',      keys:['art','design','draw','paint','creative','diy','craft','photography'] },
+  ];
+
+  let detectedNiche = '🎬 General Content';
+  let maxMatches = 0;
+  niches.forEach(n => {
+    const matches = n.keys.filter(k => desc.includes(k)).length;
+    if (matches > maxMatches) { maxMatches = matches; detectedNiche = n.name; }
+  });
+
+  // Audience profile
+  const audienceSize = subs > 10000000 ? 'Mega Audience (10M+)' :
+                       subs > 1000000  ? 'Large Audience (1M+)' :
+                       subs > 100000   ? 'Mid Audience (100K+)' :
+                       subs > 10000    ? 'Growing Audience (10K+)' : 'Early Audience (<10K)';
+
+  // Content gaps
+  const gaps = [];
+  if (eng < 3)    gaps.push('Low engagement — add polls, questions and community posts');
+  if (views < subs * 0.1) gaps.push('Low view ratio — improve thumbnail and title CTR');
+  if (vids < 50)  gaps.push('Low video count — increase posting frequency');
+  if (eng > 5 && views > subs * 0.2) gaps.push('Strong metrics — ready to monetize aggressively');
+  if (gaps.length === 0) gaps.push('Channel is well optimized — focus on consistency');
+
+  // Competitor level
+  const compLevel = subs > 1000000 ? 'Enterprise Level' :
+                    subs > 100000  ? 'Professional Level' :
+                    subs > 10000   ? 'Intermediate Level' : 'Beginner Level';
+
+  document.getElementById('nicheCard').innerHTML = `
+    <div style="text-align:center;margin-bottom:20px">
+      <div class="niche-badge">${detectedNiche}</div>
+      <div style="font-size:14px;color:rgba(255,255,255,0.4)">Detected content niche based on channel analysis</div>
+    </div>
+    <div class="niche-grid">
+      <div class="niche-item">
+        <div class="niche-item-title">👥 Audience Profile</div>
+        <div class="niche-item-val">${audienceSize}</div>
+      </div>
+      <div class="niche-item">
+        <div class="niche-item-title">🏆 Creator Level</div>
+        <div class="niche-item-val">${compLevel}</div>
+      </div>
+      <div class="niche-item">
+        <div class="niche-item-title">📌 Content Gap</div>
+        <div class="niche-item-val" style="font-size:13px">${gaps[0]}</div>
+      </div>
+      <div class="niche-item">
+        <div class="niche-item-title">⚡ Growth Stage</div>
+        <div class="niche-item-val">${eng > 5 ? '🚀 Acceleration Phase' : eng > 2 ? '📈 Growth Phase' : '🌱 Early Phase'}</div>
+      </div>
+      <div class="niche-item" style="grid-column:1/-1">
+        <div class="niche-item-title">💡 Strategy Recommendation</div>
+        <div class="niche-item-val" style="font-size:13px;line-height:1.8">
+          ${subs > 100000
+            ? 'Focus on brand deals and merchandise. Your audience size is perfect for sponsorships. Create a consistent upload schedule and engage with top comments within the first hour of posting.'
+            : subs > 10000
+            ? 'Collaborate with similar-sized channels for cross-promotion. Use YouTube Shorts to boost discoverability. Optimize all video descriptions with relevant keywords for SEO.'
+            : 'Post consistently at least 2 times per week. Focus on SEO-optimized titles and thumbnails. Study your top 3 performing videos and create more similar content.'}
+        </div>
+      </div>
+    </div>`;
+}
+
+// your new loadDashboard function here
+  async function loadDashboard() {
+  let stored = sessionStorage.getItem('channelData');
+  if (!stored) stored = localStorage.getItem('channelData');
+  if (!stored) { window.location.href='/home'; return; }
+  channelData = JSON.parse(stored);
+  sessionStorage.setItem('channelData', JSON.stringify(channelData));
+
+  document.getElementById('loadingMsg').textContent = 'Building your dashboard...';
+
+  renderAll();
+
+  const health = calculateHealth(channelData);
+  drawHealthGauge(health);
+  renderBestTime(channelData);
+  renderRevenue(channelData);
+renderShadowBan(channelData);
+renderDNA(channelData);
+renderNiche(channelData);
+
+  setTimeout(addSparkles, 500);
+  setTimeout(animateStatCards, 300);
+  setTimeout(initScrollReveal, 400);
+
+  document.getElementById('loadingPage').style.display='none';
+  document.getElementById('mainPage').style.display='block';
+
+  loadPrediction();
+  startClock();
+  setTicker(channelData);
+
+  setTimeout(() => showToast('🚀', `Welcome! ${channelData.name}`, 'Dashboard loaded successfully!'), 800);
+}
+
+loadDashboard(); 
+
+    // ── LIVE CLOCK ──
+function startClock() {
+  setInterval(() => {
+    const now = new Date();
+    document.getElementById('liveClock').textContent =
+      now.toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  }, 1000);
+}
+
+// ── TICKER ──
+function setTicker(d) {
+  const facts = [
+    `📊 ${d.name} has uploaded ${d.video_count.toLocaleString()} videos`,
+    `👁️ Average views per video: ${fmt(d.avg_views)}`,
+    `⚡ Engagement rate: ${d.engagement_rate}% — ${d.engagement_rate > 4 ? 'Above average!' : 'Room to grow'}`,
+    `🌍 Channel country: ${d.country}`,
+    `📅 Channel created: ${d.created_at}`,
+    `🔥 Total views: ${fmt(d.total_views)} — Keep it going!`,
+  ];
+  document.getElementById('tickerText').textContent = facts.join('   ·   ');
+}
+
+// ── SCROLL REVEAL ──
+function initScrollReveal() {
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+  }, {threshold: 0.1});
+  document.querySelectorAll('.stat-card,.chart-card,.pred-card,.time-card,.health-wrap').forEach(el => {
+    el.classList.add('reveal');
+    observer.observe(el);
+  });
+}
+
+// ── QUICK SEARCH ──
+async function quickSearchChannel() {
+  const input = document.getElementById('quickSearch').value.trim();
+  if (!input) { showToast('⚠️','Empty Input','Please enter a channel name or URL'); return; }
+  showToast('🔍','Searching...', `Looking up: ${input}`);
+  try {
+    const res  = await fetch('/api/channel', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({channel: input})
+    });
+    const data = await res.json();
+    if (data.success) {
+      sessionStorage.setItem('channelData', JSON.stringify(data.data));
+      showToast('✅','Found!',`Loading ${data.data.name}...`);
+      setTimeout(() => location.reload(), 1200);
+    } else {
+      showToast('❌','Not Found', data.error || 'Try a different name or URL');
+    }
+  } catch(e) {
+    showToast('❌','Error','Something went wrong. Try again.');
+  }
+}
+
+// ── SHARE ──
+function shareTwitter() {
+  const url = `https://twitter.com/intent/tweet?text=Just analyzed ${channelData.name} on Socio-Engine-X! ${channelData.subscribers.toLocaleString()} subscribers, ${channelData.engagement_rate}% engagement. 🚀&url=${encodeURIComponent(window.location.href)}`;
+  window.open(url,'_blank');
+}
+function shareLinkedIn() {
+  const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`;
+  window.open(url,'_blank');
+}
+function copyLink() {
+  navigator.clipboard.writeText(window.location.href);
+  showToast('🔗','Link Copied!','Share this dashboard with anyone');
+}
+
+// ── FAB scroll visibility ──
+window.addEventListener('scroll', () => {
+  const fab = document.getElementById('fabBtn');
+  if(fab) fab.style.opacity = window.scrollY > 300 ? '1' : '0';
+});
+const fabBtn = document.getElementById('fabBtn');
+if(fabBtn) { fabBtn.style.opacity = '0'; fabBtn.style.transition = 'opacity 0.3s'; }
+
+  </script>
+
+  <div class="toast" id="toast">
+    <div class="toast-icon" id="toastIcon"></div>
+    <div class="toast-body">
+      <div class="toast-title" id="toastTitle"></div>
+      <div class="toast-msg" id="toastMsg"></div>
+    </div>
+  </div>
+ 
+  <!-- Floating scroll-to-top button -->
+<button class="fab" id="fabBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+
+<!-- Share card -->
+<div class="page" style="padding-top:0;max-width:1400px;margin:0 auto">
+  <div class="share-card">
+    <div>
+      <div style="font-weight:700;margin-bottom:4px">Share this analysis</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.4)">Let others know about Socio-Engine-X</div>
+    </div>
+    <div class="share-btns">
+      <button class="share-btn twitter"  onclick="shareTwitter()">🐦 Twitter</button>
+      <button class="share-btn linkedin" onclick="shareLinkedIn()">💼 LinkedIn</button>
+      <button class="share-btn copy"     onclick="copyLink()">🔗 Copy Link</button>
+    </div>
+  </div>
+</div>
+
+<!-- Contact Footer -->
+<div style="
+  background:rgba(255,255,255,0.02);
+  border-top:1px solid rgba(255,255,255,0.06);
+  padding:40px 48px;
+  text-align:center;
+  position:relative;
+  z-index:10;
+">
+  <div style="font-size:13px;color:rgba(255,255,255,0.3);margin-bottom:16px;text-transform:uppercase;letter-spacing:2px;">Built by</div>
+  <div style="font-size:22px;font-weight:900;background:linear-gradient(135deg,#a855f7,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;">Ayush Tanwar</div>
+  <div style="font-size:14px;color:rgba(255,255,255,0.4);margin-bottom:20px;">AI-Powered YouTube Analytics Platform</div>
+  <a href="mailto:ayushtanwarlps20@gmail.com" style="
+    display:inline-flex;align-items:center;gap:10px;
+    background:rgba(168,85,247,0.1);
+    border:1px solid rgba(168,85,247,0.3);
+    border-radius:12px;padding:12px 24px;
+    color:#a855f7;text-decoration:none;
+    font-size:14px;font-weight:600;
+    transition:all 0.3s;
+  " onmouseover="this.style.background='rgba(168,85,247,0.2)';this.style.boxShadow='0 0 25px rgba(168,85,247,0.4)'"
+     onmouseout="this.style.background='rgba(168,85,247,0.1)';this.style.boxShadow='none'">
+    📧 ayushtanwarlps20@gmail.com
+  </a>
+  <div style="margin-top:24px;font-size:12px;color:rgba(255,255,255,0.15);">
+    🚀 Socio-Engine-X v1.0 &nbsp;|&nbsp; Made with Python, Flask & Plotly
+  </div>
+</div>
+
+</body>
+</html> 

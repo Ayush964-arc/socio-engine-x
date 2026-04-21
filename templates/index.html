@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Socio-Engine-X | Home</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Inter',sans-serif; background:#0a0a0f; color:#fff; overflow-x:hidden; }
+
+.bg-animate {
+  position:fixed; inset:0;
+  background:linear-gradient(135deg,#0a0a0f,#1a0a2e,#0a0a0f,#0d1a2e);
+  background-size:400% 400%;
+  animation:bgShift 10s ease infinite; z-index:0;
+}
+@keyframes bgShift {
+  0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%}
+}
+.orb { position:fixed; border-radius:50%; filter:blur(100px); opacity:0.15; z-index:0; }
+.orb1 { width:500px;height:500px;background:#7c3aed;top:-150px;left:-150px;animation:floatOrb 8s ease-in-out infinite; }
+.orb2 { width:400px;height:400px;background:#ec4899;bottom:-100px;right:-100px;animation:floatOrb 10s ease-in-out infinite 2s; }
+.orb3 { width:300px;height:300px;background:#3b82f6;top:40%;left:60%;animation:floatOrb 7s ease-in-out infinite 4s; }
+@keyframes floatOrb { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-40px) scale(1.08)} }
+#particles { position:fixed; inset:0; z-index:0; }
+
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:18px 48px;
+  background:rgba(10,10,15,0.6);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.nav-logo {
+  font-size:22px; font-weight:900; letter-spacing:-0.5px;
+  background:linear-gradient(135deg,#a855f7,#ec4899);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.nav-links { display:flex; gap:32px; align-items:center; }
+.nav-links a {
+  color:rgba(255,255,255,0.6); text-decoration:none; font-size:14px; font-weight:500;
+  transition:color 0.2s;
+}
+.nav-links a:hover { color:#a855f7; }
+.nav-btn {
+  background:linear-gradient(135deg,#7c3aed,#a855f7);
+  color:#fff; border:none; border-radius:10px;
+  padding:10px 24px; font-size:14px; font-weight:700;
+  cursor:pointer; transition:all 0.3s;
+  box-shadow:0 0 20px rgba(124,58,237,0.4);
+}
+.nav-btn:hover { box-shadow:0 0 35px rgba(168,85,247,0.7); transform:translateY(-1px); }
+
+.hero {
+  position:relative; z-index:10;
+  min-height:100vh; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  text-align:center; padding:120px 24px 60px;
+}
+.hero-badge {
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(124,58,237,0.15);
+  border:1px solid rgba(168,85,247,0.3);
+  border-radius:20px; padding:8px 20px;
+  font-size:13px; color:#a855f7; font-weight:600;
+  margin-bottom:28px;
+  animation:fadeDown 0.6s ease both;
+}
+@keyframes fadeDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+.hero-title {
+  font-size:clamp(42px,7vw,88px);
+  font-weight:900; line-height:1.05; letter-spacing:-3px;
+  margin-bottom:24px;
+  animation:fadeUp 0.7s ease 0.1s both;
+}
+@keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+.grad-text {
+  background:linear-gradient(135deg,#a855f7,#ec4899,#f472b6,#a855f7);
+  background-size:300% 300%;
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  animation:gradMove 4s ease infinite;
+}
+@keyframes gradMove { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+.hero-sub {
+  font-size:18px; color:rgba(255,255,255,0.55); max-width:580px;
+  line-height:1.7; margin-bottom:40px;
+  animation:fadeUp 0.7s ease 0.2s both;
+}
+.hero-btns { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; animation:fadeUp 0.7s ease 0.3s both; }
+.btn-primary {
+  background:linear-gradient(135deg,#7c3aed,#a855f7,#ec4899);
+  background-size:200% 200%;
+  color:#fff; border:none; border-radius:14px;
+  padding:16px 36px; font-size:16px; font-weight:700;
+  cursor:pointer; transition:all 0.3s;
+  box-shadow:0 0 30px rgba(124,58,237,0.5);
+  animation:gradShift 3s ease infinite;
+  position:relative; overflow:hidden;
+}
+@keyframes gradShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+.btn-primary:hover { transform:translateY(-3px); box-shadow:0 0 50px rgba(168,85,247,0.8); }
+.btn-secondary {
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.15);
+  color:#fff; border-radius:14px;
+  padding:16px 36px; font-size:16px; font-weight:600;
+  cursor:pointer; transition:all 0.3s; backdrop-filter:blur(10px);
+}
+.btn-secondary:hover { background:rgba(168,85,247,0.15); border-color:#a855f7; }
+
+.stats-bar {
+  position:relative; z-index:10;
+  display:flex; justify-content:center; gap:60px; flex-wrap:wrap;
+  padding:40px 24px;
+  background:rgba(255,255,255,0.02);
+  border-top:1px solid rgba(255,255,255,0.06);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.stat-item { text-align:center; }
+.stat-num {
+  font-size:36px; font-weight:900;
+  background:linear-gradient(135deg,#a855f7,#ec4899);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.stat-label { font-size:13px; color:rgba(255,255,255,0.4); margin-top:4px; text-transform:uppercase; letter-spacing:1px; }
+
+.features {
+  position:relative; z-index:10;
+  padding:100px 48px;
+}
+.section-title { font-size:42px; font-weight:900; text-align:center; margin-bottom:12px; }
+.section-sub { text-align:center; color:rgba(255,255,255,0.45); font-size:16px; margin-bottom:60px; }
+.features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:24px; max-width:1200px; margin:0 auto; }
+.feature-card {
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:20px; padding:32px;
+  transition:all 0.3s ease;
+  position:relative; overflow:hidden;
+  cursor:default;
+}
+.feature-card::before {
+  content:''; position:absolute; inset:0; border-radius:20px;
+  background:linear-gradient(135deg,rgba(124,58,237,0.1),rgba(236,72,153,0.05));
+  opacity:0; transition:opacity 0.3s;
+}
+.feature-card:hover::before { opacity:1; }
+.feature-card:hover {
+  border-color:rgba(168,85,247,0.4);
+  transform:translateY(-6px);
+  box-shadow:0 20px 60px rgba(124,58,237,0.2);
+}
+.feature-icon-wrap {
+  width:56px; height:56px; border-radius:14px;
+  background:linear-gradient(135deg,#7c3aed,#a855f7);
+  display:flex; align-items:center; justify-content:center;
+  font-size:26px; margin-bottom:20px;
+  box-shadow:0 0 20px rgba(124,58,237,0.4);
+}
+.feature-title { font-size:18px; font-weight:700; margin-bottom:10px; }
+.feature-desc { font-size:14px; color:rgba(255,255,255,0.5); line-height:1.7; }
+
+.search-section {
+  position:relative; z-index:10;
+  padding:80px 24px; text-align:center;
+}
+.search-wrap {
+  max-width:680px; margin:0 auto;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(168,85,247,0.3);
+  border-radius:20px; padding:40px;
+  backdrop-filter:blur(20px);
+  box-shadow:0 0 60px rgba(124,58,237,0.2);
+}
+.search-title { font-size:28px; font-weight:800; margin-bottom:8px; }
+.search-sub { color:rgba(255,255,255,0.4); font-size:14px; margin-bottom:28px; }
+.search-input-wrap { position:relative; margin-bottom:16px; }
+.search-input-wrap input {
+  width:100%; padding:18px 24px 18px 56px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:14px; color:#fff; font-size:15px;
+  font-family:'Inter',sans-serif; outline:none; transition:all 0.3s;
+}
+.search-input-wrap input:focus {
+  border-color:#a855f7;
+  box-shadow:0 0 0 3px rgba(168,85,247,0.2);
+  background:rgba(168,85,247,0.08);
+}
+.search-input-wrap input::placeholder { color:rgba(255,255,255,0.3); }
+.search-icon { position:absolute; left:18px; top:50%; transform:translateY(-50%); font-size:20px; }
+.search-btn {
+  width:100%; padding:16px;
+  background:linear-gradient(135deg,#7c3aed,#a855f7,#ec4899);
+  background-size:200% 200%; animation:gradShift 3s ease infinite;
+  border:none; border-radius:14px; color:#fff;
+  font-size:16px; font-weight:700; cursor:pointer;
+  transition:all 0.3s; box-shadow:0 0 30px rgba(124,58,237,0.4);
+}
+.search-btn:hover { transform:translateY(-2px); box-shadow:0 0 50px rgba(168,85,247,0.7); }
+.search-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+
+.loading-bar {
+  height:3px; background:linear-gradient(90deg,#7c3aed,#ec4899,#7c3aed);
+  background-size:200% 100%; border-radius:2px; margin-top:16px;
+  animation:loadSlide 1.5s ease infinite; display:none;
+}
+@keyframes loadSlide { 0%{background-position:100% 0} 100%{background-position:-100% 0} }
+
+footer {
+  position:relative; z-index:10;
+  text-align:center; padding:40px;
+  border-top:1px solid rgba(255,255,255,0.06);
+  color:rgba(255,255,255,0.25); font-size:13px;
+}
+</style>
+</head>
+<body>
+<div class="bg-animate"></div>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+<canvas id="particles"></canvas>
+
+<nav>
+  <div class="nav-logo">🚀 Socio-Engine-X</div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#analyze">Analyze</a>
+    <a href="/logout">Logout</a>
+    <button class="nav-btn" onclick="document.getElementById('channelInput').focus()">Try Now</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-badge">✨ AI-Powered · Real-Time · Free</div>
+  <h1 class="hero-title">
+    YouTube Analytics<br>
+    <span class="grad-text">Reimagined</span>
+  </h1>
+  <p class="hero-sub">Paste any YouTube channel URL or name. Get instant AI-powered analytics, growth predictions, viral video detection and competitor battle mode.</p>
+  <div class="hero-btns">
+    <button class="btn-primary" onclick="document.getElementById('channelInput').focus();document.getElementById('analyze').scrollIntoView({behavior:'smooth'})">
+      Analyze a Channel 🚀
+    </button>
+    <button class="btn-secondary" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">
+      See Features →
+    </button>
+  </div>
+</section>
+
+<div class="stats-bar">
+  <div class="stat-item"><div class="stat-num" data-target="10000">0</div><div class="stat-label">API Quota / Day</div></div>
+  <div class="stat-item"><div class="stat-num" data-target="6">0</div><div class="stat-label">AI Analysis Sections</div></div>
+  <div class="stat-item"><div class="stat-num" data-target="4">0</div><div class="stat-label">Interactive Charts</div></div>
+  <div class="stat-item"><div class="stat-num" data-target="100">0</div><div class="stat-label">Channel Health Score</div></div>
+</div>
+
+<section class="features" id="features">
+  <h2 class="section-title">Everything You Need</h2>
+  <p class="section-sub">Built for creators, marketers and students who want real insights</p>
+<div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon-wrap">📊</div>
+      <div class="feature-title">Live Channel Analytics</div>
+      <div class="feature-desc">Real-time subscribers, views, engagement rate and video performance fetched directly from YouTube Data API v3.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon-wrap">🤖</div>
+      <div class="feature-title">AI Growth Report</div>
+      <div class="feature-desc">Google Gemini AI analyzes your channel and generates growth score, pro tips, content strategy and weaknesses.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon-wrap">⚔️</div>
+      <div class="feature-title">Channel Battle Mode</div>
+      <div class="feature-desc">Compare any two YouTube channels head-to-head with animated battle cards and an overall winner declaration.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon-wrap">📈</div>
+      <div class="feature-title">Growth Prediction</div>
+      <div class="feature-desc">AI-powered forecast showing where your channel will be in 1, 3, 6 and 12 months based on current trajectory.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon-wrap">🔥</div>
+      <div class="feature-title">Viral Video Detector</div>
+      <div class="feature-desc">Automatically flags which video performed way above average with a fire badge and AI explanation of why it went viral.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon-wrap">💡</div>
+      <div class="feature-title">Best Time to Post</div>
+      <div class="feature-desc">AI recommendation on optimal posting days and frequency based on your channel's recent performance patterns.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon-wrap">💰</div>
+      <div class="feature-title">Revenue Estimator</div>
+      <div class="feature-desc">Estimates monthly and annual ad revenue range based on views, engagement rate and niche. Shows per-video earnings too.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon-wrap">🔍</div>
+      <div class="feature-title">Shadow Ban Detector</div>
+      <div class="feature-desc">Detects if your channel is being suppressed by the algorithm. Shows health score, view ratio and recovery recommendations.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon-wrap">🧬</div>
+      <div class="feature-title">Channel DNA Fingerprint</div>
+      <div class="feature-desc">A unique radar chart showing your channel's personality across 6 dimensions — Entertainment, Education, Consistency and more.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon-wrap">🎯</div>
+      <div class="feature-title">Niche Detector</div>
+      <div class="feature-desc">AI identifies your exact content niche, target audience profile, content gaps and competitor positioning strategy.</div>
+    </div>
+</div>  
+</section>
+
+<section class="search-section" id="analyze">
+  <div class="search-wrap">
+    <div class="search-title">Analyze Any Channel</div>
+    <div class="search-sub">Paste a YouTube URL, @handle or just type a channel name</div>
+    <div class="search-input-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="channelInput" placeholder="e.g. https://youtube.com/@MrBeast  or  MrBeast">
+    </div>
+    <button class="search-btn" id="searchBtn" onclick="analyzeChannel()">Analyze Now 🚀</button>
+    <div class="loading-bar" id="loadingBar"></div>
+  </div>
+</section>
+
+<footer>🚀 Socio-Engine-X &nbsp;|&nbsp; AI-Powered YouTube Analytics &nbsp;|&nbsp; Built by Ayush Tanwar</footer>
+
+<script>
+// Particles
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+const particles = Array.from({length:100}, () => ({
+  x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+  r: Math.random()*2+0.5,
+  dx: (Math.random()-0.5)*0.4, dy: (Math.random()-0.5)*0.4,
+  color: Math.random()>0.5?'168,85,247':'236,72,153'
+}));
+function animPart() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p => {
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(${p.color},${Math.random()*0.4+0.2})`; ctx.fill();
+    p.x+=p.dx; p.y+=p.dy;
+    if(p.x<0||p.x>canvas.width) p.dx*=-1;
+    if(p.y<0||p.y>canvas.height) p.dy*=-1;
+  });
+  requestAnimationFrame(animPart);
+}
+animPart();
+window.addEventListener('resize',()=>{canvas.width=window.innerWidth;canvas.height=window.innerHeight;});
+
+// Counter animation
+function animateCounters() {
+  document.querySelectorAll('[data-target]').forEach(el => {
+    const target = parseInt(el.dataset.target);
+    let current = 0;
+    const step = target / 60;
+    const timer = setInterval(() => {
+      current += step;
+      if (current >= target) { el.textContent = target.toLocaleString(); clearInterval(timer); }
+      else el.textContent = Math.floor(current).toLocaleString();
+    }, 20);
+  });
+}
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) animateCounters(); });
+}, {threshold:0.5});
+document.querySelectorAll('.stats-bar').forEach(el => observer.observe(el));
+
+// Enter key
+document.getElementById('channelInput').addEventListener('keydown', e => {
+  if(e.key==='Enter') analyzeChannel();
+});
+
+// Analyze
+async function analyzeChannel() {
+  const input = document.getElementById('channelInput').value.trim();
+  if(!input) { alert('Please enter a channel name or URL'); return; }
+  const btn = document.getElementById('searchBtn');
+  const bar = document.getElementById('loadingBar');
+  btn.disabled = true;
+  btn.textContent = 'Fetching channel data...';
+  bar.style.display = 'block';
+  try {
+    const res = await fetch('/api/channel', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({channel: input})
+    });
+    const data = await res.json();
+    if(data.success) {
+      sessionStorage.setItem('channelData', JSON.stringify(data.data));
+      // Verify it saved
+      const check = sessionStorage.getItem('channelData');
+      if(check) {
+        window.location.href = '/dashboard';
+      } else {
+        // Fallback — pass via URL param
+        localStorage.setItem('channelData', JSON.stringify(data.data));
+        window.location.href = '/dashboard';
+      }
+    } else {
+      alert(data.error || 'Channel not found.');
+      btn.disabled=false;
+      btn.textContent='Analyze Now 🚀';
+      bar.style.display='none';
+    }
+  } catch(err) {
+    alert('Something went wrong. Please try again.');
+    btn.disabled=false;
+    btn.textContent='Analyze Now 🚀';
+    bar.style.display='none';
+  }
+}
+
+</script>
+<!-- Contact Footer -->
+<div style="
+  position:relative;z-index:10;
+  background:rgba(255,255,255,0.02);
+  border-top:1px solid rgba(255,255,255,0.06);
+  padding:40px 48px;
+  text-align:center;
+">
+  <div style="font-size:13px;color:rgba(255,255,255,0.3);margin-bottom:16px;text-transform:uppercase;letter-spacing:2px;">Built by</div>
+  <div style="font-size:22px;font-weight:900;background:linear-gradient(135deg,#a855f7,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;">Ayush Tanwar</div>
+  <a href="mailto:ayushtanwarlps20@gmail.com" style="
+    display:inline-flex;align-items:center;gap:10px;
+    background:rgba(168,85,247,0.1);
+    border:1px solid rgba(168,85,247,0.3);
+    border-radius:12px;padding:12px 24px;
+    color:#a855f7;text-decoration:none;
+    font-size:14px;font-weight:600;
+  ">
+    📧 ayushtanwarlps20@gmail.com
+  </a>
+  <div style="margin-top:16px;font-size:12px;color:rgba(255,255,255,0.15);">
+    🚀 Socio-Engine-X v1.0 &nbsp;|&nbsp; Made with Python, Flask & Plotly
+  </div>
+</div>
+</body>
+</html>

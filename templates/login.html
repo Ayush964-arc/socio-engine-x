@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Socio-Engine-X | Login</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    background: #0a0a0f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* Animated gradient background */
+  .bg-animate {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #0a0a0f, #1a0a2e, #0a0a0f, #0d1a2e);
+    background-size: 400% 400%;
+    animation: bgShift 8s ease infinite;
+    z-index: 0;
+  }
+  @keyframes bgShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* Floating orbs */
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.25;
+    animation: float 6s ease-in-out infinite;
+    z-index: 0;
+  }
+  .orb1 { width: 400px; height: 400px; background: #7c3aed; top: -100px; left: -100px; animation-delay: 0s; }
+  .orb2 { width: 300px; height: 300px; background: #ec4899; bottom: -80px; right: -80px; animation-delay: 2s; }
+  .orb3 { width: 200px; height: 200px; background: #3b82f6; top: 50%; left: 50%; animation-delay: 4s; }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) scale(1); }
+    50%       { transform: translateY(-30px) scale(1.05); }
+  }
+
+  /* Particle canvas */
+  #particles { position: fixed; inset: 0; z-index: 0; }
+
+  /* Glassmorphism card */
+  .login-card {
+    position: relative;
+    z-index: 10;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 28px;
+    padding: 52px 48px;
+    width: 420px;
+    box-shadow:
+      0 0 60px rgba(124,58,237,0.3),
+      0 0 120px rgba(236,72,153,0.1),
+      inset 0 1px 0 rgba(255,255,255,0.1);
+    animation: cardIn 0.8s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(40px) scale(0.95); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* Logo */
+  .logo-wrap { text-align: center; margin-bottom: 8px; }
+  .logo-icon {
+    font-size: 52px;
+    display: inline-block;
+    animation: spin3d 4s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px rgba(168,85,247,0.8));
+  }
+  @keyframes spin3d {
+    0%,100% { transform: rotateY(0deg); }
+    50%      { transform: rotateY(20deg) scale(1.1); }
+  }
+
+  .logo-title {
+    font-size: 28px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #a855f7, #ec4899, #f472b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+    letter-spacing: -1px;
+    margin-bottom: 4px;
+  }
+  .logo-sub {
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 36px;
+  }
+
+  /* Input */
+  .input-wrap {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  .input-wrap input {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px;
+    padding: 16px 20px 16px 50px;
+    color: #fff;
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: all 0.3s ease;
+  }
+  .input-wrap input:focus {
+    border-color: #a855f7;
+    background: rgba(168,85,247,0.08);
+    box-shadow: 0 0 0 3px rgba(168,85,247,0.2);
+  }
+  .input-wrap input::placeholder { color: rgba(255,255,255,0.3); }
+  .input-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    opacity: 0.5;
+  }
+
+  /* Button */
+  .login-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #7c3aed, #a855f7, #ec4899);
+    background-size: 200% 200%;
+    border: none;
+    border-radius: 14px;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: gradShift 3s ease infinite;
+    box-shadow: 0 0 30px rgba(124,58,237,0.5);
+    position: relative;
+    overflow: hidden;
+  }
+  @keyframes gradShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 50px rgba(168,85,247,0.8);
+  }
+  .login-btn:active { transform: scale(0.98); }
+  .login-btn .btn-shine {
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+  }
+  .login-btn:hover .btn-shine { left: 100%; }
+
+  /* Error message */
+  .error-msg {
+    background: rgba(239,68,68,0.15);
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: #fca5a5;
+    font-size: 13px;
+    margin-top: 14px;
+    display: none;
+    text-align: center;
+  }
+
+  /* Hint */
+  .hint {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.25);
+  }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="bg-animate"></div>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+<canvas id="particles"></canvas>
+
+<div class="login-card">
+  <div class="logo-wrap">
+    <div class="logo-icon">🚀</div>
+  </div>
+  <div class="logo-title">Socio-Engine-X</div>
+  <div class="logo-sub">AI YouTube Analytics</div>
+
+  <div class="input-wrap">
+    <span class="input-icon">🔑</span>
+    <input type="password" id="password" placeholder="Enter access password" autocomplete="off">
+  </div>
+
+  <button class="login-btn" onclick="doLogin()">
+    <span class="btn-shine"></span>
+    Enter Platform 🚀
+  </button>
+
+  <div class="error-msg" id="error-msg"></div>
+  <div class="hint">Password protected · Socio-Engine-X v1.0</div>
+</div>
+
+<script>
+// Particles
+const canvas = document.getElementById('particles');
+const ctx    = canvas.getContext('2d');
+canvas.width  = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const particles = Array.from({ length: 80 }, () => ({
+  x:    Math.random() * canvas.width,
+  y:    Math.random() * canvas.height,
+  r:    Math.random() * 2 + 0.5,
+  dx:   (Math.random() - 0.5) * 0.4,
+  dy:   (Math.random() - 0.5) * 0.4,
+  color: Math.random() > 0.5 ? '168,85,247' : '236,72,153'
+}));
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${p.color},${Math.random() * 0.5 + 0.3})`;
+    ctx.fill();
+    p.x += p.dx;
+    p.y += p.dy;
+    if (p.x < 0 || p.x > canvas.width)  p.dx *= -1;
+    if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+  });
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+window.addEventListener('resize', () => {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+// Login
+document.getElementById('password').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+async function doLogin() {
+  const pw  = document.getElementById('password').value;
+  const err = document.getElementById('error-msg');
+  const btn = document.querySelector('.login-btn');
+
+  btn.textContent = 'Verifying...';
+
+  const res  = await fetch('/login', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ password: pw })
+  });
+  const data = await res.json();
+
+  if (data.success) {
+    btn.textContent = '✅ Access Granted!';
+    btn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+    setTimeout(() => window.location.href = '/home', 800);
+  } else {
+    err.textContent    = data.message || 'Wrong password.';
+    err.style.display  = 'block';
+    btn.innerHTML      = '<span class="btn-shine"></span>Enter Platform 🚀';
+    document.getElementById('password').value = '';
+    document.getElementById('password').style.borderColor = '#ef4444';
+    setTimeout(() => {
+      document.getElementById('password').style.borderColor = '';
+      err.style.display = 'none';
+    }, 3000);
+  }
+}
+</script>
+</body>
+</html>
