@@ -7,7 +7,7 @@ pandas
 Pillow
 requests
 
-sec-list
+
 flask
 flask-session
 google-api-python-client
